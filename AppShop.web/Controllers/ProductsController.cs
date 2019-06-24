@@ -1,18 +1,21 @@
 ﻿namespace AppShop.web.Controllers
 {
-    using Data;
-    using Data.Entities;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
-    using System.Threading.Tasks;
+    using Helpers;
+    using Data;
+    using Data.Entities;
 
     public class ProductsController : Controller
     {
         private readonly IRepository repository;
+        private readonly IUserHelper userHelper;
 
-        public ProductsController(IRepository repository)
+        public ProductsController(IRepository repository,IUserHelper userHelper)
         {
             this.repository = repository;
+            this.userHelper = userHelper;
         }
 
         public IActionResult Index()
@@ -47,6 +50,8 @@
         {
             if (ModelState.IsValid)
             {
+                //TODO: Change for the logged user
+                product.User = await this.userHelper.GetUserByEmailAsync("bcarias84@gmail.com");
                 this.repository.AddProduct(product);
                 await this.repository.SaveAllAsync();
                 return RedirectToAction(nameof(Index));
@@ -78,6 +83,8 @@
             {
                 try
                 {
+                    //TODO: Change for the logged user
+                    product.User = await this.userHelper.GetUserByEmailAsync("bcarias84@gmail.com");
                     this.repository.UpdateProduct(product);
                     await this.repository.SaveAllAsync();
                 }
